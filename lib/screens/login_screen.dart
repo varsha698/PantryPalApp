@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:login_page/screens/home_screen.dart';
+import 'package:login_page/screens/signup_screen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -152,8 +154,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text("Don't have an account? "),
                       GestureDetector(
-                        onTap: () {
-                          // Navigate to SignUp screen
+                        onTap: () {// Navigate to SignUp screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                          );  
                         },
                         child: const Text(
                           "Sign up",
