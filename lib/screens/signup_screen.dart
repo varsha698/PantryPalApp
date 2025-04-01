@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 👈 added
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -27,10 +28,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // Create user in Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
+      // Save profile info in Firestore
+      final uid = userCredential.user?.uid;
+
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'firstName': nameController.text.trim(),
+        'lastName': '', // optional
+        'email': emailController.text.trim(),
+        'username': "@${nameController.text.trim().toLowerCase()}",
+        'phone': '',
+        'pronouns': '',
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Account created successfully!")),
@@ -101,7 +116,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   fillColor: const Color(0xFFF2F2F2),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () {
                       setState(() {
                         _obscurePassword = !_obscurePassword;
@@ -123,7 +140,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   fillColor: const Color(0xFFF2F2F2),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                      _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () {
                       setState(() {
                         _obscureConfirm = !_obscureConfirm;
