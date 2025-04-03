@@ -23,10 +23,20 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Recipe> allRecipes = [];
   List<Recipe> matchedRecipes = [];
 
+  // 🔥 NEW: screen list
+  late List<Widget> _screens;
+
   @override
   void initState() {
     super.initState();
     loadRecipes();
+
+    _screens = [
+      buildPantryScreen(),
+      const Center(child: Text("Community Screen")), // Placeholder
+      const Center(child: Text("Organizations Screen")), // Placeholder
+      const ProfileScreen(), // ✅ Your profile page
+    ];
   }
 
   Future<void> loadRecipes() async {
@@ -94,7 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ]),
           const SizedBox(height: 16),
 
-          // Input Bar
           TextField(
             controller: pantryController,
             onSubmitted: addPantryItem,
@@ -251,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.orange,
         title: const Text('PantryPal'),
       ),
-      body: buildPantryScreen(),
+      body: _screens[_selectedIndex], // ✅ Navigation now works
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
