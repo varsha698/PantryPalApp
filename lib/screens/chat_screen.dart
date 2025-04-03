@@ -17,7 +17,7 @@ class _ChatScreenState extends State<ChatScreen> {
     FirebaseFirestore.instance.collection('chat_messages').add({
       'text': _messageController.text.trim(),
       'timestamp': FieldValue.serverTimestamp(),
-      'sender': 'varsha', // You can replace this with dynamic user data
+      'sender': 'varsha', 
     });
 
     _messageController.clear();
