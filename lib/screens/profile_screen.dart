@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,6 +22,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController pronounsController;
 
   final userId = FirebaseAuth.instance.currentUser?.uid;
+  String? profileImageUrl;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -39,8 +44,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
         usernameController = TextEditingController(text: data['username'] ?? '');
         phoneController = TextEditingController(text: data['phone'] ?? '');
         pronounsController = TextEditingController(text: data['pronouns'] ?? '');
+        profileImageUrl = data['profileImageUrl'];
       });
     }
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null || userId == null) return;
+
+    final File imageFile = File(pickedFile.path);
+    final storageRef = FirebaseStorage.instance.ref().child('profile_pictures/$userId.jpg');
+
+    await storageRef.putFile(imageFile);
+    final downloadUrl = await storageRef.getDownloadURL();
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'profileImageUrl': downloadUrl,
+    });
+
+    setState(() {
+      profileImageUrl = downloadUrl;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile picture updated")),
+    );
   }
 
   Future<void> _saveProfile() async {
@@ -92,13 +121,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Profile picture
-            const CircleAvatar(
+            // Profile picture with dynamic image
+            CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+              backgroundImage: profileImageUrl != null
+                  ? NetworkImage(profileImageUrl!)
+                  : const AssetImage('assets/images/profile_placeholder.png') as ImageProvider,
             ),
             const SizedBox(height: 8),
-            const Text("Change Photo", style: TextStyle(color: Colors.blue)),
+            GestureDetector(
+              onTap: _pickAndUploadImage,
+              child: const Text(
+                "Change Photo",
+                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              ),
+            ),
 
             const SizedBox(height: 24),
             _buildTextField("First Name", firstNameController, readOnly: !isEditing),

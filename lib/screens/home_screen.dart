@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:login_page/screens/profile_screen.dart';
+import 'package:login_page/screens/community_screen.dart'; // Make sure this path matches your project
 import '../models/recipe.dart';
 import '../utils/recipe_loader.dart';
 
@@ -80,6 +81,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
 
     setState(() => matchedRecipes = matches);
+  }
+
+  // Method to return the screen for each tab
+  Widget _getSelectedScreen() {
+    switch (_selectedIndex) {
+      case 0:
+        return buildPantryScreen();
+      case 1:
+        return const CommunityScreen();
+      case 2:
+        return Center(child: Text("Organizations Screen Coming Soon")); // Placeholder
+      case 3:
+        return const ProfileScreen(); // Make sure this screen is implemented
+      default:
+        return buildPantryScreen();
+    }
   }
 
   Widget buildPantryScreen() {
@@ -260,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.orange,
         title: const Text('PantryPal'),
       ),
-      body: _screens[_selectedIndex], // ✅ Navigation now works
+      body: _getSelectedScreen(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
