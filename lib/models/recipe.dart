@@ -3,7 +3,7 @@ class Recipe {
   final List<String> ingredients;
   final String duration;
   final String image;
-  final String steps;
+  final List<String> steps; // ⬅ changed to List<String>
   final String budget;
 
   Recipe({
@@ -21,7 +21,7 @@ class Recipe {
       ingredients: List<String>.from(json['ingredients']),
       duration: json['duration'],
       image: json['image'],
-      steps: json['steps'],
+      steps: List<String>.from(json['steps']), // ✅ Correctly handle steps as list
       budget: json['budget'],
     );
   }
