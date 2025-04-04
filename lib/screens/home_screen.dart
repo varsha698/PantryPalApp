@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_page/screens/profile_screen.dart';
-import 'package:login_page/screens/community_screen.dart'; // Make sure this path matches your project
+import 'package:login_page/screens/community_screen.dart';
 import '../models/recipe.dart';
 import '../utils/recipe_loader.dart';
 
@@ -24,20 +25,32 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Recipe> allRecipes = [];
   List<Recipe> matchedRecipes = [];
 
-  // 🔥 NEW: screen list
-  late List<Widget> _screens;
+  String? profileImageUrl;
+  String? username;
 
   @override
   void initState() {
     super.initState();
     loadRecipes();
+    fetchUserProfile();
+  }
 
-    _screens = [
-      buildPantryScreen(),
-      const Center(child: Text("Community Screen")), // Placeholder
-      const Center(child: Text("Organizations Screen")), // Placeholder
-      const ProfileScreen(), // ✅ Your profile page
-    ];
+  Future<void> fetchUserProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      final data = doc.data();
+      if (data != null) {
+        setState(() {
+          profileImageUrl = data['profileImageUrl'];
+          username = data['username'] ?? user.email;
+        });
+      }
+    }
   }
 
   Future<void> loadRecipes() async {
@@ -83,7 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => matchedRecipes = matches);
   }
 
-  // Method to return the screen for each tab
   Widget _getSelectedScreen() {
     switch (_selectedIndex) {
       case 0:
@@ -91,32 +103,35 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const CommunityScreen();
       case 2:
-        return Center(child: Text("Organizations Screen Coming Soon")); // Placeholder
+        return Center(child: Text("Organizations Screen Coming Soon"));
       case 3:
-        return const ProfileScreen(); // Make sure this screen is implemented
+        return const ProfileScreen();
       default:
         return buildPantryScreen();
     }
   }
 
   Widget buildPantryScreen() {
-    final user = FirebaseAuth.instance.currentUser;
-
     return Container(
       color: const Color(0xFFFFF3E0),
       padding: const EdgeInsets.all(16),
       child: SingleChildScrollView(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 22,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+              backgroundImage: profileImageUrl != null
+                  ? NetworkImage(profileImageUrl!)
+                  : const AssetImage('assets/images/profile_placeholder.png')
+                      as ImageProvider,
             ),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text("Welcome, 👋", style: TextStyle(fontSize: 12)),
-              Text(user?.displayName ?? user?.email ?? '',
-                  style: const TextStyle(fontWeight: FontWeight.bold))
+              Text(
+                username ?? '',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )
             ])
           ]),
           const SizedBox(height: 16),
