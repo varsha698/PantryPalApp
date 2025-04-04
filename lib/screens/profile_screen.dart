@@ -53,16 +53,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null || userId == null) return;
 
-    setState(() {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Uploading image...")),
-      );
-    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Uploading image...")),
+    );
 
     try {
       final File imageFile = File(pickedFile.path);
       final fileExtension = pickedFile.path.split('.').last;
-      final fileName = '$userId.$fileExtension'; // 👈 dynamic extension
+      final fileName = '$userId.$fileExtension';
       final storageRef = FirebaseStorage.instance.ref().child('profile_pictures/$fileName');
 
       await storageRef.putFile(imageFile);
@@ -125,7 +123,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF3E0), // ✅ Background color added
       appBar: AppBar(
+        backgroundColor: Colors.orange,
         title: const Text("Your Profile"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
