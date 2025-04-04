@@ -32,12 +32,13 @@ dependencies:
     sdk: flutter
   firebase_core: ^3.12.1
   firebase_auth: ^5.5.1
+  uuid: ^4.0.0
   cupertino_icons: ^1.0.8
   firebase_auth_platform_interface: 7.6.1
   firebase_auth_web: 5.14.1
+  firebase_storage: ^12.4.4
   cloud_firestore: 5.6.5
   image_picker: ^1.1.2
-  firebase_storage: 12.4.4
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -69,6 +70,7 @@ flutter:
     - assets/images/stir_fry.jpg
     - assets/images/rice_bowl.jpg
     - assets/images/omelette.jpg
+    - assets/images/profile_placeholder.png
 
 
   # To add assets to your application, add an assets section, like this:

@@ -53,23 +53,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null || userId == null) return;
 
-    final File imageFile = File(pickedFile.path);
-    final storageRef = FirebaseStorage.instance.ref().child('profile_pictures/$userId.jpg');
-
-    await storageRef.putFile(imageFile);
-    final downloadUrl = await storageRef.getDownloadURL();
-
-    await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'profileImageUrl': downloadUrl,
-    });
-
     setState(() {
-      profileImageUrl = downloadUrl;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Uploading image...")),
+      );
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile picture updated")),
-    );
+    try {
+      final File imageFile = File(pickedFile.path);
+      final fileExtension = pickedFile.path.split('.').last;
+      final fileName = '$userId.$fileExtension'; // 👈 dynamic extension
+      final storageRef = FirebaseStorage.instance.ref().child('profile_pictures/$fileName');
+
+      await storageRef.putFile(imageFile);
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'profileImageUrl': downloadUrl,
+      });
+
+      setState(() {
+        profileImageUrl = downloadUrl;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile picture updated")),
+      );
+    } catch (e) {
+      debugPrint("Upload failed: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to upload image: $e")),
+      );
+    }
   }
 
   Future<void> _saveProfile() async {
@@ -121,7 +136,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Profile picture with dynamic image
             CircleAvatar(
               radius: 50,
               backgroundImage: profileImageUrl != null
