@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_page/screens/profile_screen.dart';
 import 'package:login_page/screens/community_screen.dart';
+import 'package:login_page/screens/matching_recipes_screen.dart'; // 👈 ADDED
 import '../models/recipe.dart';
 import '../utils/recipe_loader.dart';
 
@@ -57,8 +58,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final recipes = await loadRecipesFromJson();
     setState(() {
       allRecipes = recipes;
+      matchedRecipes = getLowBudgetMeals(recipes); // 👈 Display low-budget meals
     });
   }
+
+   List<Recipe> getLowBudgetMeals(List<Recipe> recipes){
+  return recipes.where((r) {
+    final budget = int.tryParse(r.budget); // ✅ Safely convert string to number
+    return budget != null && budget <= 10;
+  }).toList();
+}
+
 
   void addPantryItem(String item) {
     final normalized = item.toLowerCase();
@@ -80,20 +90,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void filterRecipes() {
-    if (pantryItems.isEmpty) {
-      setState(() => matchedRecipes = []);
-      return;
-    }
+  List<Recipe> filterRecipes() {
+    if (pantryItems.isEmpty) return [];
 
-    final matches = allRecipes.where((recipe) {
+    return allRecipes.where((recipe) {
       int matchCount = recipe.ingredients
           .where((ingredient) => pantryItems.contains(ingredient.toLowerCase()))
           .length;
-      return matchCount >= (pantryItems.length / 2).ceil();
+      return matchCount >= (recipe.ingredients.length / 2).ceil();
     }).toList();
-
-    setState(() => matchedRecipes = matches);
   }
 
   Widget _getSelectedScreen() {
@@ -122,8 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
               radius: 22,
               backgroundImage: profileImageUrl != null
                   ? NetworkImage(profileImageUrl!)
-                  : const AssetImage('assets/images/profile_placeholder.png')
-                      as ImageProvider,
+                  : const AssetImage('assets/images/profile_placeholder.png') as ImageProvider,
             ),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -187,7 +191,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: filterRecipes,
+            onPressed: () {
+              final filtered = filterRecipes();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MatchingRecipesScreen(recipes: filtered),
+                ),
+              );
+            },
             icon: const Icon(Icons.restaurant_menu),
             label: const Text("Show Recipes with Pantry Items"),
             style: ElevatedButton.styleFrom(
