@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_page/screens/profile_screen.dart';
 import 'package:login_page/screens/community_screen.dart';
 import 'package:login_page/screens/organization_screen.dart'; 
-import 'package:login_page/screens/community_screen.dart';
-import 'package:login_page/screens/matching_recipes_screen.dart'; // 👈 ADDED
+import 'package:login_page/screens/matching_recipes_screen.dart'; 
 import '../models/recipe.dart';
 import '../utils/recipe_loader.dart';
 
@@ -60,13 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final recipes = await loadRecipesFromJson();
     setState(() {
       allRecipes = recipes;
-      matchedRecipes = getLowBudgetMeals(recipes); // 👈 Display low-budget meals
+      matchedRecipes = getLowBudgetMeals(recipes); 
     });
   }
 
    List<Recipe> getLowBudgetMeals(List<Recipe> recipes){
   return recipes.where((r) {
-    final budget = int.tryParse(r.budget); // ✅ Safely convert string to number
+    final budget = int.tryParse(r.budget); 
     return budget != null && budget <= 10;
   }).toList();
 }
@@ -110,10 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const CommunityScreen();
       case 2:
-        return const OrganizationScreen(); // ✅ Replaced placeholder
+        return const OrganizationScreen();
         return Center(child: Text("Organizations Screen Coming Soon"));
       case 3:
-        return const ProfileScreen();
         return const ProfileScreen();
       default:
         return buildPantryScreen();
