@@ -63,11 +63,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF3E0), // 🔥 Matching background color
+      backgroundColor: const Color(0xFFFFF3E0), //  Matching background color
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: SingleChildScrollView( // ✅ To prevent overflow on smaller screens
+          child: SingleChildScrollView( //  To prevent overflow on smaller screens
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

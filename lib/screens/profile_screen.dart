@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-// ✅ Make sure this import path matches your project structure
+//  Make sure this import path matches your project structure
 import 'package:login_page/screens/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
