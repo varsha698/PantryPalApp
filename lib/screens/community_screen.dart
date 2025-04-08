@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_page/screens/PostScreen.dart';
-import 'package:login_page/screens/chat_screen.dart'; // ✅ Import ChatScreen
+import 'package:login_page/screens/chat_screen.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
@@ -84,14 +84,13 @@ class CommunityScreen extends StatelessWidget {
             ),
           ),
 
-          // Join the Community Chat Group button
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ChatScreen()), // ✅ Navigate to chat
+                  MaterialPageRoute(builder: (_) => const ChatScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(

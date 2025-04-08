@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // 👈 added
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -28,19 +28,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     try {
-      // Create user in Firebase Auth
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Save profile info in Firestore
       final uid = userCredential.user?.uid;
 
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'firstName': nameController.text.trim(),
-        'lastName': '', // optional
+        'lastName': '', 
         'email': emailController.text.trim(),
         'username': "@${nameController.text.trim().toLowerCase()}",
         'phone': '',
@@ -51,7 +49,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const SnackBar(content: Text("Account created successfully!")),
       );
 
-      // Navigate back to login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),

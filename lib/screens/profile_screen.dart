@@ -92,7 +92,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Profile picture
             const CircleAvatar(
               radius: 50,
               backgroundImage: AssetImage('assets/images/profile_placeholder.png'),

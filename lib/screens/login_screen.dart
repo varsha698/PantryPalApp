@@ -46,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // 🍑 Background image
           Positioned.fill(
             child: Image.asset(
               'assets/images/login_bg.png',
@@ -61,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Spacer(flex: 1),
 
-                  // 👩‍🍳 Logo
                   Center(
                     child: Container(
                       height: 60,

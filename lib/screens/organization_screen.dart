@@ -21,7 +21,7 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
 
   Future<List<FoodResource>> loadResourcesFromJson() async {
     final jsonString = await DefaultAssetBundle.of(context)
-        .loadString('assets/data/resources.json'); // make sure this matches the path
+        .loadString('assets/data/resources.json'); 
     final List jsonData = json.decode(jsonString);
     return jsonData.map((e) => FoodResource.fromJson(e)).toList();
   }
@@ -39,7 +39,7 @@ void _launchURL(String? url) async {
   try {
     final bool launched = await launchUrl(
       uri,
-      mode: LaunchMode.externalApplication, // ✅ Opens in Chrome/Safari
+      mode: LaunchMode.externalApplication, 
     );
 
     if (!launched) {
