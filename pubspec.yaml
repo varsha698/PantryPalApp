@@ -1,7 +1,7 @@
 name: login_page
 description: "A Flutter project for managing pantry inventory and finding recipes."
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -24,7 +24,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
   assets:
+    - assets/data/recipe.csv
+    - assets/images/
+    - assets/images/profile_placeholder.png
     - assets/images/login_bg.png
-    - assets/recipe/recipes.csv 
-      # Include your CSV file

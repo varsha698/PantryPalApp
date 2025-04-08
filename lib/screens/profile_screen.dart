@@ -80,12 +80,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (firstNameController == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Profile"),
