@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';    // Gives access to all UI widgets
+import 'package:firebase_auth/firebase_auth.dart'; //Used for user authentication with firebase
 import 'package:login_page/screens/home_screen.dart';
 import 'package:login_page/screens/signup_screen.dart';
 
@@ -17,13 +17,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   Future<void> login() async {
-    print("🚀 login() called");
+    print(" login() called");
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      print("✅ Firebase login success: ${credential.user?.email}");
+      print("Firebase login success: ${credential.user?.email}");
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login successful!')),
@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
-      print("❌ FirebaseAuthException: ${e.code} - ${e.message}");
+      print(" FirebaseAuthException: ${e.code} - ${e.message}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Login failed')),
       );
@@ -46,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
+          //  Background image
           Positioned.fill(
             child: Image.asset(
               'assets/images/login_bg.png',
@@ -60,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Spacer(flex: 1),
 
+                  //  Logo
                   Center(
                     child: Container(
                       height: 60,

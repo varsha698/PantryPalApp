@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_page/screens/profile_screen.dart';
 import 'package:login_page/screens/community_screen.dart';
 import 'package:login_page/screens/organization_screen.dart'; 
+import 'package:login_page/screens/community_screen.dart';
+import 'package:login_page/screens/matching_recipes_screen.dart'; // 👈 ADDED
 import '../models/recipe.dart';
 import '../utils/recipe_loader.dart';
 
@@ -25,18 +28,49 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Recipe> allRecipes = [];
   List<Recipe> matchedRecipes = [];
 
+  String? profileImageUrl;
+  String? username;
+
   @override
   void initState() {
     super.initState();
     loadRecipes();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      final data = doc.data();
+      if (data != null) {
+        setState(() {
+          profileImageUrl = data['profileImageUrl'];
+          username = data['username'] ?? user.email;
+        });
+      }
+    }
   }
 
   Future<void> loadRecipes() async {
     final recipes = await loadRecipesFromJson();
     setState(() {
       allRecipes = recipes;
+      matchedRecipes = getLowBudgetMeals(recipes); // 👈 Display low-budget meals
     });
   }
+
+   List<Recipe> getLowBudgetMeals(List<Recipe> recipes){
+  return recipes.where((r) {
+    final budget = int.tryParse(r.budget); // ✅ Safely convert string to number
+    return budget != null && budget <= 10;
+  }).toList();
+}
+
 
   void addPantryItem(String item) {
     final normalized = item.toLowerCase();
@@ -58,20 +92,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void filterRecipes() {
-    if (pantryItems.isEmpty) {
-      setState(() => matchedRecipes = []);
-      return;
-    }
+  List<Recipe> filterRecipes() {
+    if (pantryItems.isEmpty) return [];
 
-    final matches = allRecipes.where((recipe) {
+    return allRecipes.where((recipe) {
       int matchCount = recipe.ingredients
           .where((ingredient) => pantryItems.contains(ingredient.toLowerCase()))
           .length;
-      return matchCount >= (pantryItems.length / 2).ceil();
+      return matchCount >= (recipe.ingredients.length / 2).ceil();
     }).toList();
-
-    setState(() => matchedRecipes = matches);
   }
 
   Widget _getSelectedScreen() {
@@ -82,7 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
         return const CommunityScreen();
       case 2:
         return const OrganizationScreen(); // ✅ Replaced placeholder
+        return Center(child: Text("Organizations Screen Coming Soon"));
       case 3:
+        return const ProfileScreen();
         return const ProfileScreen();
       default:
         return buildPantryScreen();
@@ -90,23 +121,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildPantryScreen() {
-    final user = FirebaseAuth.instance.currentUser;
-
     return Container(
       color: const Color(0xFFFFF3E0),
       padding: const EdgeInsets.all(16),
       child: SingleChildScrollView(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 22,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+              backgroundImage: profileImageUrl != null
+                  ? NetworkImage(profileImageUrl!)
+                  : const AssetImage('assets/images/profile_placeholder.png') as ImageProvider,
             ),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text("Welcome, 👋", style: TextStyle(fontSize: 12)),
-              Text(user?.displayName ?? user?.email ?? '',
-                  style: const TextStyle(fontWeight: FontWeight.bold))
+              Text(
+                username ?? '',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )
             ])
           ]),
           const SizedBox(height: 16),
@@ -160,7 +193,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: filterRecipes,
+            onPressed: () {
+              final filtered = filterRecipes();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MatchingRecipesScreen(recipes: filtered),
+                ),
+              );
+            },
             icon: const Icon(Icons.restaurant_menu),
             label: const Text("Show Recipes with Pantry Items"),
             style: ElevatedButton.styleFrom(
