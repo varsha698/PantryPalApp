@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -14,10 +15,12 @@ class _ChatScreenState extends State<ChatScreen> {
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
 
+    final currentUser = FirebaseAuth.instance.currentUser;
+
     FirebaseFirestore.instance.collection('chat_messages').add({
       'text': _messageController.text.trim(),
       'timestamp': FieldValue.serverTimestamp(),
-      'sender': 'varsha', 
+      'sender': currentUser?.displayName ?? currentUser?.email ?? 'Unknown',
     });
 
     _messageController.clear();
@@ -26,7 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Community Chat")),
+      appBar: AppBar(title: const Text("Community Chat")),
       body: Column(
         children: [
           Expanded(
@@ -36,7 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   .orderBy('timestamp', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
                 final messages = snapshot.data!.docs;
 
@@ -52,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         data['timestamp'] != null
                             ? (data['timestamp'] as Timestamp).toDate().toLocal().toString().split('.')[0]
                             : '',
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                     );
                   },
@@ -60,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          Divider(height: 1),
+          const Divider(height: 1),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -75,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: _sendMessage,
                   color: Theme.of(context).primaryColor,
                 )

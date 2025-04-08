@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:login_page/screens/profile_screen.dart';
-import 'package:login_page/screens/community_screen.dart'; // Make sure this path matches your project
+import 'package:login_page/screens/community_screen.dart';
+import 'package:login_page/screens/organization_screen.dart'; 
 import '../models/recipe.dart';
 import '../utils/recipe_loader.dart';
 
@@ -73,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => matchedRecipes = matches);
   }
 
-  // Method to return the screen for each tab
   Widget _getSelectedScreen() {
     switch (_selectedIndex) {
       case 0:
@@ -81,9 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const CommunityScreen();
       case 2:
-        return Center(child: Text("Organizations Screen Coming Soon")); // Placeholder
+        return const OrganizationScreen(); // ✅ Replaced placeholder
       case 3:
-        return const ProfileScreen(); // Make sure this screen is implemented
+        return const ProfileScreen();
       default:
         return buildPantryScreen();
     }
@@ -111,7 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ]),
           const SizedBox(height: 16),
 
-          // Input Bar
           TextField(
             controller: pantryController,
             onSubmitted: addPantryItem,
@@ -138,8 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 .map((item) => Chip(
                       label: Text(item),
                       deleteIcon: const Icon(Icons.cancel),
-                      onDeleted: () =>
-                          setState(() => pantryItems.remove(item)),
+                      onDeleted: () => setState(() => pantryItems.remove(item)),
                     ))
                 .toList(),
           ),
@@ -149,8 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
             spacing: 8,
             runSpacing: 8,
             children: suggestions.map((suggestion) {
-              final isSelected =
-                  pantryItems.contains(suggestion.toLowerCase());
+              final isSelected = pantryItems.contains(suggestion.toLowerCase());
               return FilterChip(
                 label: Text(suggestion),
                 selected: isSelected,
@@ -230,8 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Text(recipe.name,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14)),
+                                    fontWeight: FontWeight.bold, fontSize: 14)),
                             const SizedBox(height: 4),
                             Row(
                               children: [
@@ -243,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontSize: 12, color: Colors.grey)),
                               ],
                             ),
-                            Text("Budget: ${recipe.budget}",
+                            Text("Budget: \${recipe.budget}",
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey)),
                           ],
