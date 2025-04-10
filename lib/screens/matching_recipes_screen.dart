@@ -1,90 +1,127 @@
 import 'package:flutter/material.dart';
+import 'recipe_details_screen.dart';
 import '../models/recipe.dart';
 
 class MatchingRecipesScreen extends StatelessWidget {
   final List<Recipe> recipes;
+  final Set<String> selectedPantryItems;
 
-  const MatchingRecipesScreen({super.key, required this.recipes});
+  const MatchingRecipesScreen({
+    super.key,
+    required this.recipes,
+    required this.selectedPantryItems,
+  });
+
+  int matchedCount(List<String> ingredients) {
+    return ingredients.where((item) => selectedPantryItems.contains(item.trim())).length;
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Step 1: Filter out recipes with no matches
+    List<Recipe> filtered = recipes.where((recipe) {
+      return matchedCount(recipe.ingredients) > 0;
+    }).toList();
+
+    // Step 2: Sort by number of matches (descending)
+    filtered.sort((a, b) {
+      int aMatch = matchedCount(a.ingredients);
+      int bMatch = matchedCount(b.ingredients);
+      return bMatch.compareTo(aMatch); // Most matched at top
+    });
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF3E0),
+      backgroundColor: const Color(0xFFFFF3E9),
       appBar: AppBar(
-        backgroundColor: Colors.orange,
         title: const Text("Matching Recipes"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: recipes.isEmpty
+        child: filtered.isEmpty
             ? const Center(child: Text("No matching recipes found."))
             : ListView.builder(
-                itemCount: recipes.length,
+                itemCount: filtered.length,
                 itemBuilder: (context, index) {
-                  final recipe = recipes[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              recipe.image,
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.fastfood),
-                            ),
+                  final recipe = filtered[index];
+                  final match = matchedCount(recipe.ingredients);
+                  final total = recipe.ingredients.length;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            recipe.image,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  recipe.name,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(recipe.name,
                                   style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                      fontSize: 16, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text(
+                                "$match / $total ingredients match",
+                                style: TextStyle(
+                                  color: match >= total / 2
+                                      ? Colors.green
+                                      : Colors.orange,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.access_time, size: 16),
-                                    const SizedBox(width: 4),
-                                    Text(recipe.duration),
-                                    const SizedBox(width: 16),
-                                    const Icon(Icons.attach_money, size: 16),
-                                    Text(recipe.budget),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // TODO: Navigate to recipe_details_screen.dart
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.black,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Icon(Icons.access_time, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(recipe.duration),
+                                  const SizedBox(width: 12),
+                                  const Icon(Icons.attach_money, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text("\$${recipe.budget}"),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          RecipeDetailsScreen(recipe: recipe),
                                     ),
-                                    child: const Text("View Recipe"),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                              ],
-                            ),
+                                child: const Text("View Recipe"),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        )
+                      ],
                     ),
                   );
                 },

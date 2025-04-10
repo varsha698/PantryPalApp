@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:csv/csv.dart';
+
 import 'package:login_page/screens/profile_screen.dart';
 import 'package:login_page/screens/community_screen.dart';
-import 'package:login_page/screens/organization_screen.dart'; 
-import 'package:login_page/screens/matching_recipes_screen.dart'; 
-import '../models/recipe.dart';
-import '../utils/recipe_loader.dart';
+import 'package:login_page/screens/organization_screen.dart';
+import 'package:login_page/screens/matching_recipes_screen.dart';
+import 'package:login_page/models/recipe.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    loadRecipes();
+    loadRecipesFromCsv();
     fetchUserProfile();
   }
 
@@ -55,21 +57,39 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> loadRecipes() async {
-    final recipes = await loadRecipesFromJson();
-    setState(() {
-      allRecipes = recipes;
-      matchedRecipes = getLowBudgetMeals(recipes); 
-    });
+  Future<void> loadRecipesFromCsv() async {
+    try {
+      final csvString = await rootBundle.loadString('assets/data/recipe.csv');
+      List<List<dynamic>> csvTable =
+          const CsvToListConverter(eol: '\n').convert(csvString);
+
+      final recipes = csvTable.skip(1).map<Recipe>((row) {
+        return Recipe(
+          name: row[0].toString(),
+          image: 'assets/images/${row[1].toString().trim()}',
+          ingredients:
+              row[2].toString().split(',').map((e) => e.trim().toLowerCase()).toList(),
+          steps: row[3].toString().split('.').map((e) => e.trim()).toList(),
+          duration: row[4].toString(),
+          budget: row[5].toString(),
+        );
+      }).toList();
+
+      setState(() {
+        allRecipes = recipes;
+        matchedRecipes = getLowBudgetMeals(recipes);
+      });
+    } catch (e) {
+      print("Error loading CSV: $e");
+    }
   }
 
-   List<Recipe> getLowBudgetMeals(List<Recipe> recipes){
-  return recipes.where((r) {
-    final budget = int.tryParse(r.budget); 
-    return budget != null && budget <= 10;
-  }).toList();
-}
-
+  List<Recipe> getLowBudgetMeals(List<Recipe> recipes) {
+    return recipes.where((r) {
+      final budget = double.tryParse(r.budget);
+      return budget != null && budget <= 10;
+    }).toList();
+  }
 
   void addPantryItem(String item) {
     final normalized = item.toLowerCase();
@@ -93,12 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Recipe> filterRecipes() {
     if (pantryItems.isEmpty) return [];
-
     return allRecipes.where((recipe) {
-      int matchCount = recipe.ingredients
-          .where((ingredient) => pantryItems.contains(ingredient.toLowerCase()))
-          .length;
-      return matchCount >= (recipe.ingredients.length / 2).ceil();
+      return recipe.ingredients.any((ingredient) =>
+          pantryItems.contains(ingredient));
     }).toList();
   }
 
@@ -110,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
         return const CommunityScreen();
       case 2:
         return const OrganizationScreen();
-        return Center(child: Text("Organizations Screen Coming Soon"));
       case 3:
         return const ProfileScreen();
       default:
@@ -129,7 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
               radius: 22,
               backgroundImage: profileImageUrl != null
                   ? NetworkImage(profileImageUrl!)
-                  : const AssetImage('assets/images/profile_placeholder.png') as ImageProvider,
+                  : const AssetImage('assets/images/profile_placeholder.png')
+                      as ImageProvider,
             ),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -178,7 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
             spacing: 8,
             runSpacing: 8,
             children: suggestions.map((suggestion) {
-              final isSelected = pantryItems.contains(suggestion.toLowerCase());
+              final isSelected =
+                  pantryItems.contains(suggestion.toLowerCase());
               return FilterChip(
                 label: Text(suggestion),
                 selected: isSelected,
@@ -196,7 +214,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => MatchingRecipesScreen(recipes: filtered),
+                  builder: (_) => MatchingRecipesScreen(
+                    recipes: filtered,
+                    selectedPantryItems: pantryItems.toSet(),
+                  ),
                 ),
               );
             },
@@ -278,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontSize: 12, color: Colors.grey)),
                               ],
                             ),
-                            Text("Budget: \${recipe.budget}",
+                            Text("Budget: \$${recipe.budget}",
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey)),
                           ],

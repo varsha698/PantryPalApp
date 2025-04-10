@@ -69,12 +69,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/login_bg.png
-    - assets/data/recipes.json
-    - assets/images/stir_fry.jpg
-    - assets/images/rice_bowl.jpg
-    - assets/images/omelette.jpg
     - assets/data/resources.json
     - assets/images/profile_placeholder.png
+    - assets/data/recipe.csv
+    - assets/images/
 
 
   # To add assets to your application, add an assets section, like this:
