@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/recipe.dart';
 import 'recipe_details_screen.dart';
+import '../models/recipe.dart';
 
 class MatchingRecipesScreen extends StatelessWidget {
   final List<Recipe> recipes;

@@ -14,4 +14,15 @@ class Recipe {
     required this.duration,
     required this.budget,
   });
+
+  factory Recipe.fromCsv(Map<String, dynamic> data) {
+    return Recipe(
+      name: data['name'] ?? '',
+      image: data['image'] ?? '',
+      ingredients: List<String>.from(data['ingredients']),
+      steps: List<String>.from(data['steps']),
+      duration: data['duration'] ?? '',
+      budget: data['budget'] ?? '',
+    );
+  }
 }
