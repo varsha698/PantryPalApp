@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +31,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize controllers to prevent LateInitializationError
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
+    emailController = TextEditingController();
+    usernameController = TextEditingController();
+    phoneController = TextEditingController();
+    pronounsController = TextEditingController();
+
     _loadUserData();
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers to prevent memory leaks
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    usernameController.dispose();
+    phoneController.dispose();
+    pronounsController.dispose();
+    super.dispose();
   }
 
   void _loadUserData() async {
@@ -40,12 +62,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final data = doc.data();
     if (data != null) {
       setState(() {
-        firstNameController = TextEditingController(text: data['firstName'] ?? '');
-        lastNameController = TextEditingController(text: data['lastName'] ?? '');
-        emailController = TextEditingController(text: data['email'] ?? '');
-        usernameController = TextEditingController(text: data['username'] ?? '');
-        phoneController = TextEditingController(text: data['phone'] ?? '');
-        pronounsController = TextEditingController(text: data['pronouns'] ?? '');
+        firstNameController.text = data['firstName'] ?? '';
+        lastNameController.text = data['lastName'] ?? '';
+        emailController.text = data['email'] ?? '';
+        usernameController.text = data['username'] ?? '';
+        phoneController.text = data['phone'] ?? '';
+        pronounsController.text = data['pronouns'] ?? '';
         profileImageUrl = data['profileImageUrl'];
       });
     }
@@ -172,7 +194,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
               ),
             ),
-
             const SizedBox(height: 24),
             _buildTextField("First Name", firstNameController, readOnly: !isEditing),
             _buildTextField("Last Name", lastNameController, readOnly: !isEditing),
@@ -180,7 +201,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildTextField("Username", usernameController, readOnly: !isEditing),
             _buildTextField("Phone Number(Optional)", phoneController, readOnly: !isEditing),
             _buildTextField("Pronouns(Optional)", pronounsController, readOnly: !isEditing),
-
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
