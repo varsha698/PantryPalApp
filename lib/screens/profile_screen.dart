@@ -178,8 +178,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildTextField("Last Name", lastNameController, readOnly: !isEditing),
             _buildTextField("Email Address", emailController, readOnly: true),
             _buildTextField("Username", usernameController, readOnly: !isEditing),
-            _buildTextField("Phone Number", phoneController, readOnly: !isEditing),
-            _buildTextField("Pronouns", pronounsController, readOnly: !isEditing),
+            _buildTextField("Phone Number(Optional)", phoneController, readOnly: !isEditing),
+            _buildTextField("Pronouns(Optional)", pronounsController, readOnly: !isEditing),
 
             const SizedBox(height: 24),
             ElevatedButton(
