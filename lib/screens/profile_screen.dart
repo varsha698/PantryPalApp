@@ -4,9 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
-//  Make sure this import path matches your project structure
 import 'package:login_page/screens/home_screen.dart';
+import 'package:login_page/screens/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -91,19 +90,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveProfile() async {
     if (userId == null) return;
 
-    await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'firstName': firstNameController.text.trim(),
-      'lastName': lastNameController.text.trim(),
-      'username': usernameController.text.trim(),
-      'phone': phoneController.text.trim(),
-      'pronouns': pronounsController.text.trim(),
-    });
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'firstName': firstNameController.text.trim(),
+        'lastName': lastNameController.text.trim(),
+        'username': usernameController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'pronouns': pronounsController.text.trim(),
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile updated successfully")),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully")),
+      );
+
+      setState(() => isEditing = false);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update profile: $e")),
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
     );
-
-    setState(() => isEditing = false);
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
@@ -181,7 +195,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: Colors.blue,
               ),
               child: Text(isEditing ? "Save Profile" : "Edit Profile"),
-            )
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _logout,
+              icon: const Icon(Icons.logout),
+              label: const Text("Logout"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size.fromHeight(50),
+              ),
+            ),
           ],
         ),
       ),
