@@ -17,8 +17,8 @@ class MatchingRecipesScreen extends StatefulWidget {
 }
 
 class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
-  int maxTime = 120;
-  double maxBudget = 50;
+  int maxTime = 60;
+  double maxBudget = 15;
 
   int matchedCount(List<String> ingredients) {
     return ingredients
@@ -60,8 +60,8 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                         label: "Max Time: $maxTime min",
                         value: maxTime.toDouble(),
                         min: 10,
-                        max: 120,
-                        divisions: 11,
+                        max: 60,
+                        divisions: 6,
                         onChanged: (value) =>
                             setState(() => maxTime = value.toInt()),
                       ),
@@ -76,8 +76,8 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                         label: "Max Budget: \$$maxBudget",
                         value: maxBudget,
                         min: 5,
-                        max: 50,
-                        divisions: 9,
+                        max: 15,
+                        divisions: 10,
                         onChanged: (value) =>
                             setState(() => maxBudget = value),
                       ),
