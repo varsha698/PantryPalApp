@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:login_page/screens/home_screen.dart';
 import 'package:login_page/screens/login_screen.dart';
+import 'package:login_page/screens/settings_screen.dart'; 
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,8 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Initialize controllers to prevent LateInitializationError
     firstNameController = TextEditingController();
     lastNameController = TextEditingController();
     emailController = TextEditingController();
@@ -45,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
-    // Dispose controllers to prevent memory leaks
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
@@ -58,7 +55,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _loadUserData() async {
     if (userId == null) return;
     final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-
     final data = doc.data();
     if (data != null) {
       setState(() {
@@ -175,6 +171,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings), // ⚙️ Settings icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
