@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
-//  Make sure this import path matches your project structure
 import 'package:login_page/screens/home_screen.dart';
+import 'package:login_page/screens/login_screen.dart';
+import 'package:login_page/screens/settings_screen.dart'; 
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,22 +31,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
+    emailController = TextEditingController();
+    usernameController = TextEditingController();
+    phoneController = TextEditingController();
+    pronounsController = TextEditingController();
+
     _loadUserData();
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    usernameController.dispose();
+    phoneController.dispose();
+    pronounsController.dispose();
+    super.dispose();
   }
 
   void _loadUserData() async {
     if (userId == null) return;
     final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-
     final data = doc.data();
     if (data != null) {
       setState(() {
-        firstNameController = TextEditingController(text: data['firstName'] ?? '');
-        lastNameController = TextEditingController(text: data['lastName'] ?? '');
-        emailController = TextEditingController(text: data['email'] ?? '');
-        usernameController = TextEditingController(text: data['username'] ?? '');
-        phoneController = TextEditingController(text: data['phone'] ?? '');
-        pronounsController = TextEditingController(text: data['pronouns'] ?? '');
+        firstNameController.text = data['firstName'] ?? '';
+        lastNameController.text = data['lastName'] ?? '';
+        emailController.text = data['email'] ?? '';
+        usernameController.text = data['username'] ?? '';
+        phoneController.text = data['phone'] ?? '';
+        pronounsController.text = data['pronouns'] ?? '';
         profileImageUrl = data['profileImageUrl'];
       });
     }
@@ -91,19 +108,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveProfile() async {
     if (userId == null) return;
 
-    await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'firstName': firstNameController.text.trim(),
-      'lastName': lastNameController.text.trim(),
-      'username': usernameController.text.trim(),
-      'phone': phoneController.text.trim(),
-      'pronouns': pronounsController.text.trim(),
-    });
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'firstName': firstNameController.text.trim(),
+        'lastName': lastNameController.text.trim(),
+        'username': usernameController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'pronouns': pronounsController.text.trim(),
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile updated successfully")),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully")),
+      );
+
+      setState(() => isEditing = false);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update profile: $e")),
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
     );
-
-    setState(() => isEditing = false);
   }
 
   Widget _buildTextField(String label, TextEditingController controller,
@@ -139,6 +171,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings), // ⚙️ Settings icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -158,15 +201,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
               ),
             ),
-
             const SizedBox(height: 24),
             _buildTextField("First Name", firstNameController, readOnly: !isEditing),
             _buildTextField("Last Name", lastNameController, readOnly: !isEditing),
             _buildTextField("Email Address", emailController, readOnly: true),
             _buildTextField("Username", usernameController, readOnly: !isEditing),
-            _buildTextField("Phone Number", phoneController, readOnly: !isEditing),
-            _buildTextField("Pronouns", pronounsController, readOnly: !isEditing),
-
+            _buildTextField("Phone Number(Optional)", phoneController, readOnly: !isEditing),
+            _buildTextField("Pronouns(Optional)", pronounsController, readOnly: !isEditing),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
@@ -181,7 +222,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: Colors.blue,
               ),
               child: Text(isEditing ? "Save Profile" : "Edit Profile"),
-            )
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _logout,
+              icon: const Icon(Icons.logout),
+              label: const Text("Logout"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size.fromHeight(50),
+              ),
+            ),
           ],
         ),
       ),
