@@ -219,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.grey.shade100,
               ),
               child: Text(isEditing ? "Save Profile" : "Edit Profile"),
             ),
@@ -229,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: const Icon(Icons.logout),
               label: const Text("Logout"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor:Colors.grey.shade100,
                 minimumSize: const Size.fromHeight(50),
               ),
             ),
