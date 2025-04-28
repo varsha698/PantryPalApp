@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="gcm_defaultSenderId" translatable="false">556196335680</string>
-    <string name="google_api_key" translatable="false">AIzaSyAh4NStRtLfumoOo3auoljx80-JEIkDRLE</string>
-    <string name="google_app_id" translatable="false">1:556196335680:android:114211106d9a9c92224fa5</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAh4NStRtLfumoOo3auoljx80-JEIkDRLE</string>
-    <string name="google_storage_bucket" translatable="false">pantrypal-5985692.firebasestorage.app</string>
-    <string name="project_id" translatable="false">pantrypal-5985692</string>
-</resources>
