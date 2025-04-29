@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Pantry'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Community'),
           BottomNavigationBarItem(icon: Icon(Icons.apartment), label: 'Organizations'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
