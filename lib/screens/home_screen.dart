@@ -61,17 +61,23 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final csvString = await rootBundle.loadString('assets/data/recipe.csv');
       List<List<dynamic>> csvTable =
-          const CsvToListConverter(eol: '\n').convert(csvString);
+          const CsvToListConverter(eol: '\n', shouldParseNumbers: false).convert(csvString);
 
       final recipes = csvTable.skip(1).map<Recipe>((row) {
+        final ingredientsRaw = (row[2] ?? '').toString();
+        final stepsRaw = (row[3] ?? '').toString();
+        
         return Recipe(
-          name: row[0].toString(),
-          image: 'assets/images/${row[1].toString().trim()}',
-          ingredients:
-              row[2].toString().split(',').map((e) => e.trim().toLowerCase()).toList(),
-          steps: row[3].toString().split('.').map((e) => e.trim()).toList(),
-          duration: row[4].toString(),
-          budget: row[5].toString(),
+          name: (row[0] ?? '').toString().trim(),
+          image: 'assets/images/${(row[1] ?? '').toString().trim()}',
+          ingredients: ingredientsRaw.split(',').map((e) => e.trim().toLowerCase()).where((e) => e.isNotEmpty).toList(),
+          steps: stepsRaw.contains('.') 
+              ? stepsRaw.split('.').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
+              : [stepsRaw.trim()],
+          duration: (row[4] ?? '').toString(),
+          budget: double.tryParse(row[5].toString()) ?? 0,
+          vegan: int.tryParse(row[6].toString()) ?? 0,
+          dairy: int.tryParse(row[7].toString()) ?? 0,
         );
       }).toList();
 
@@ -79,16 +85,15 @@ class _HomeScreenState extends State<HomeScreen> {
         allRecipes = recipes;
         matchedRecipes = getLowBudgetMeals(recipes);
       });
+
+      print("✅ Loaded ${recipes.length} recipes successfully!");
     } catch (e) {
-      print("Error loading CSV: $e");
+      print("❌ Error loading CSV: $e");
     }
   }
 
   List<Recipe> getLowBudgetMeals(List<Recipe> recipes) {
-    return recipes.where((r) {
-      final budget = double.tryParse(r.budget);
-      return budget != null && budget <= 10;
-    }).toList();
+    return recipes.where((r) => r.budget <= 10).toList();
   }
 
   void addPantryItem(String item) {
@@ -299,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontSize: 12, color: Colors.grey)),
                               ],
                             ),
-                            Text("Budget: \$${recipe.budget}",
+                            Text("Budget: \$${recipe.budget.toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey)),
                           ],
@@ -331,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Pantry'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Community'),
           BottomNavigationBarItem(icon: Icon(Icons.apartment), label: 'Organizations'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),

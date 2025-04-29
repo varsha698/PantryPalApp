@@ -162,13 +162,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             CircleAvatar(
               radius: 18,
               backgroundImage: data['photoUrl'] != null ? NetworkImage(data['photoUrl']) : null,
+              backgroundColor: Colors.blueGrey,
               child: data['photoUrl'] == null
                   ? Text(
                       (data['sender'] ?? 'U')[0].toUpperCase(),
                       style: const TextStyle(color: Colors.white),
                     )
                   : null,
-              backgroundColor: Colors.blueGrey,
             ),
           const SizedBox(width: 8),
           Flexible(

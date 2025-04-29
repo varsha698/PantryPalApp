@@ -1,28 +1,21 @@
 class Recipe {
   final String name;
-  final String image;
   final List<String> ingredients;
   final List<String> steps;
+  final String image;
   final String duration;
-  final String budget;
+  final double budget;
+  final int vegan; // 1 = vegan, 0 = not vegan
+  final int dairy; // 1 = contains dairy, 0 = dairy-free
 
   Recipe({
     required this.name,
-    required this.image,
     required this.ingredients,
     required this.steps,
+    required this.image,
     required this.duration,
     required this.budget,
+    required this.vegan,
+    required this.dairy,
   });
-
-  factory Recipe.fromCsv(Map<String, dynamic> data) {
-    return Recipe(
-      name: data['name'] ?? '',
-      image: data['image'] ?? '',
-      ingredients: List<String>.from(data['ingredients']),
-      steps: List<String>.from(data['steps']),
-      duration: data['duration'] ?? '',
-      budget: data['budget'] ?? '',
-    );
-  }
 }

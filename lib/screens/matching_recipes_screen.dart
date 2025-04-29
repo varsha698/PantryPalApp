@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'recipe_details_screen.dart';
 import '../models/recipe.dart';
+import 'recipe_details_screen.dart';
 
 class MatchingRecipesScreen extends StatefulWidget {
   final List<Recipe> recipes;
@@ -19,6 +19,8 @@ class MatchingRecipesScreen extends StatefulWidget {
 class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
   int maxTime = 60;
   double maxBudget = 15;
+  bool veganOnly = false;
+  bool dairyFreeOnly = false;
 
   int matchedCount(List<String> ingredients) {
     return ingredients
@@ -29,11 +31,16 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
   @override
   Widget build(BuildContext context) {
     List<Recipe> filtered = widget.recipes.where((recipe) {
-      int durationMinutes = int.parse(recipe.duration.split(' ').first);
-      double recipeBudget = double.parse(recipe.budget.toString());
+      int durationMinutes = int.tryParse(recipe.duration.split(' ').first) ?? 0;
+      double recipeBudget = recipe.budget;
+      bool matchesVegan = !veganOnly || (recipe.vegan == 1);
+      bool matchesDairyFree = !dairyFreeOnly || (recipe.dairy == 0);
+
       return matchedCount(recipe.ingredients) > 0 &&
           durationMinutes <= maxTime &&
-          recipeBudget <= maxBudget;
+          recipeBudget <= maxBudget &&
+          matchesVegan &&
+          matchesDairyFree;
     }).toList();
 
     filtered.sort((a, b) =>
@@ -61,7 +68,7 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                         value: maxTime.toDouble(),
                         min: 10,
                         max: 60,
-                        divisions: 6,
+                        divisions: 5,
                         onChanged: (value) =>
                             setState(() => maxTime = value.toInt()),
                       ),
@@ -83,6 +90,28 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                       ),
                     ),
                     Text("\$${maxBudget.toStringAsFixed(0)}"),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Vegan Only"),
+                    Switch(
+                      value: veganOnly,
+                      onChanged: (value) =>
+                          setState(() => veganOnly = value),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Dairy-Free Only"),
+                    Switch(
+                      value: dairyFreeOnly,
+                      onChanged: (value) =>
+                          setState(() => dairyFreeOnly = value),
+                    ),
                   ],
                 ),
               ],
@@ -116,6 +145,7 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Placeholder(),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -146,7 +176,7 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                                       const SizedBox(width: 12),
                                       const Icon(Icons.attach_money, size: 16),
                                       const SizedBox(width: 4),
-                                      Text("\$${recipe.budget}"),
+                                      Text("\$${recipe.budget.toStringAsFixed(2)}"),
                                     ],
                                   ),
                                   const SizedBox(height: 10),
