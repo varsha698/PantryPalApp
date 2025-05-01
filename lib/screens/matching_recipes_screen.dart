@@ -33,8 +33,9 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
     List<Recipe> filtered = widget.recipes.where((recipe) {
       int durationMinutes = int.tryParse(recipe.duration.split(' ').first) ?? 0;
       double recipeBudget = recipe.budget;
-      bool matchesVegan = !veganOnly || (recipe.vegan == 1);
-      bool matchesDairyFree = !dairyFreeOnly || (recipe.dairy == 0);
+
+      bool matchesVegan = !veganOnly || recipe.vegan == 1;
+      bool matchesDairyFree = !dairyFreeOnly || recipe.dairy == 0;
 
       return matchedCount(recipe.ingredients) > 0 &&
           durationMinutes <= maxTime &&
@@ -145,7 +146,8 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Placeholder(),
+                                errorBuilder: (_, __, ___) =>
+                                    const Placeholder(),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -176,7 +178,9 @@ class _MatchingRecipesScreenState extends State<MatchingRecipesScreen> {
                                       const SizedBox(width: 12),
                                       const Icon(Icons.attach_money, size: 16),
                                       const SizedBox(width: 4),
-                                      Text("\$${recipe.budget.toStringAsFixed(2)}"),
+                                      Text(
+                                        "\$${recipe.budget.toStringAsFixed(2)}",
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 10),
