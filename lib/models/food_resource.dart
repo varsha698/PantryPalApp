@@ -7,6 +7,8 @@ class FoodResource {
   final String type;
   final String imageUrl;
   final int rating;
+  final double? latitude;
+  final double? longitude;
 
   FoodResource({
     required this.name,
@@ -17,6 +19,8 @@ class FoodResource {
     required this.type,
     required this.imageUrl,
     required this.rating,
+    this.latitude,
+    this.longitude,
   });
 
   factory FoodResource.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,8 @@ class FoodResource {
       type: json['type'] ?? '',
       imageUrl: json['image'] ?? '',
       rating: json['rating'] ?? 0,
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
     );
   }
 }
