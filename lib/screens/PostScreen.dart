@@ -43,7 +43,6 @@ class _PostScreenState extends State<PostScreen> {
     String? imageUrl;
 
     try {
-      // Upload image if selected
       if (_image != null) {
         String imageId = const Uuid().v4();
         final ref = FirebaseStorage.instance
@@ -56,12 +55,10 @@ class _PostScreenState extends State<PostScreen> {
         imageUrl = await snapshot.ref.getDownloadURL();
       }
 
-      // Fetch username from users collection
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
       final userData = userDoc.data();
       final username = userData?['username'] ?? currentUser.email?.split('@').first ?? 'Unknown';
 
-      // Save post to Firestore
       await FirebaseFirestore.instance.collection('community_posts').add({
         'author': username,
         'content': _contentController.text.trim(),
@@ -74,7 +71,6 @@ class _PostScreenState extends State<PostScreen> {
         const SnackBar(content: Text("Post created successfully!")),
       );
 
-      // Reset fields
       setState(() {
         _contentController.clear();
         _image = null;
@@ -95,16 +91,25 @@ class _PostScreenState extends State<PostScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("New Post"),
-        backgroundColor: Colors.orange,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_image != null)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.file(_image!, height: 200, fit: BoxFit.cover),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      _image!,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      height: 240,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   TextButton.icon(
                     onPressed: () => setState(() => _image = null),
@@ -126,18 +131,17 @@ class _PostScreenState extends State<PostScreen> {
                 labelText: "What's on your mind?",
                 border: OutlineInputBorder(),
               ),
-              maxLines: 4,
+              maxLines: 5,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton.icon(
-                    onPressed: _uploadPost,
-                    icon: const Icon(Icons.send),
-                    label: const Text("Post"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      minimumSize: const Size(double.infinity, 50),
+                ? const Center(child: CircularProgressIndicator())
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _uploadPost,
+                      icon: const Icon(Icons.send),
+                      label: const Text("Post"),
                     ),
                   ),
           ],
@@ -146,5 +150,3 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 }
-
-
