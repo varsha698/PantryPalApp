@@ -61,20 +61,26 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final csvString = await rootBundle.loadString('assets/data/recipe.csv');
       List<List<dynamic>> csvTable =
-          const CsvToListConverter(eol: '\n', shouldParseNumbers: false).convert(csvString);
+          const CsvToListConverter(eol: '\n', shouldParseNumbers: false)
+              .convert(csvString);
 
       final recipes = csvTable.skip(1).map<Recipe>((row) {
-        final ingredientsRaw = (row[2] ?? '').toString();
-        final stepsRaw = (row[3] ?? '').toString();
-        
         return Recipe(
           name: (row[0] ?? '').toString().trim(),
           image: 'assets/images/${(row[1] ?? '').toString().trim()}',
-          ingredients: ingredientsRaw.split(',').map((e) => e.trim().toLowerCase()).where((e) => e.isNotEmpty).toList(),
-          steps: stepsRaw.contains('.') 
-              ? stepsRaw.split('.').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
-              : [stepsRaw.trim()],
-          duration: (row[4] ?? '').toString(),
+          ingredients: (row[2] ?? '')
+              .toString()
+              .split(',')
+              .map((e) => e.trim().toLowerCase())
+              .where((e) => e.isNotEmpty)
+              .toList(),
+          steps: (row[3] ?? '')
+              .toString()
+              .split('.')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList(),
+          duration: row[4].toString(),
           budget: double.tryParse(row[5].toString()) ?? 0,
           vegan: int.tryParse(row[6].toString()) ?? 0,
           dairy: int.tryParse(row[7].toString()) ?? 0,
