@@ -28,5 +28,5 @@
 ## 👥 Contributors
 
 - [Varshini Bhavanam](https://github.com/varsha698)
-- Niharika Bomma
+- [Niharika Bomma](https://github.com/BOMMA034)
 - Ayesha Noshin
