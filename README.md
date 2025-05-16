@@ -9,7 +9,6 @@
 - 🧾 **Pantry Tracker** – Add and manage pantry inventory with expiration dates.
 - 🍲 **Smart Recipe Matching** – Get recipe suggestions based on available ingredients.
 - 🏷️ **Tags & Filters** – Filter recipes by dietary needs, time, and budget.
-- 📅 **Interview Calendar** – Schedule and tag job interviews with locations and types.
 - 💬 **Community Chat & Comments** – Discuss tips and suggestions with others.
 - 🛒 **Food Resource Directory** – Connect to local pantries and assistance programs.
 - 🔁 **CI/CD** – GitHub Actions integrated for automated testing and deployment.
