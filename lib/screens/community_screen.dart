@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'PostScreen.dart';
+import 'post_screen.dart';
 import 'chat_screen.dart';
 import 'comment_screen.dart';
 
