@@ -41,6 +41,7 @@ class _CommentScreenState extends State<CommentScreen> {
 
       _commentController.clear();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to post comment: $e')),
       );
@@ -67,7 +68,9 @@ class _CommentScreenState extends State<CommentScreen> {
                   .orderBy('timestamp', descending: false)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
                 final comments = snapshot.data!.docs;
 
