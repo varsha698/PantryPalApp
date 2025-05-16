@@ -36,7 +36,7 @@ dependencies:
   uuid: ^4.0.0
   cupertino_icons: ^1.0.8
   firebase_auth_platform_interface: 7.6.1
-  firebase_auth_web: 5.14.1
+  firebase_auth_web: ^5.3.4
   firebase_storage: ^12.4.4
   cloud_firestore: 5.6.5
   firebase_app_check: ^0.3.2+5
