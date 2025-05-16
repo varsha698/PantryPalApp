@@ -244,9 +244,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           const SizedBox(height: 24),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text("Low-Budget Meals",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Text("View All", style: TextStyle(color: Colors.black54)),

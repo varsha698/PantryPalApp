@@ -89,7 +89,7 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
 
   void _launchMaps(String address) async {
     print("Launching address: $address");
-    final testAddress = "219 E 1st St, Duluth, MN 55802";
+    const testAddress = "219 E 1st St, Duluth, MN 55802";
     final testUrl = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(testAddress)}';
     final uri = Uri.parse(testUrl);
 
